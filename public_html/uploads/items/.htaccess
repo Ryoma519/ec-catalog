@@ -1,0 +1,21 @@
+# アップロードされたファイルは、このディレクトリ内では
+# 「画像として配信されるだけ」で「実行はされない」ようにする。
+
+# PHPの実行を無効化（mod_php環境）
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+
+# 実行される可能性のある拡張子へのアクセスを拒否（Apache 2.4系）
+<FilesMatch "\.(php|phtml|php3|php4|php5|pl|py|cgi|asp|aspx|sh)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
