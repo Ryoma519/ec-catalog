@@ -9,6 +9,15 @@ $category = trim($_GET['category'] ?? '');
 // ページ番号
 $page = max(1, (int)($_GET['page'] ?? 1));
 $perPage = 9;
+// 並び替え：ORDER BYの列名・方向はプレースホルダにできないため、
+// 必ずホワイトリスト（許可リスト）に照合してから使う。
+$sortOptions = [
+    'new'        => 'created_at DESC',
+    'price_asc'  => 'price ASC',
+    'price_desc' => 'price DESC',
+];
+$sort    = $_GET['sort'] ?? 'new';
+$orderBy = $sortOptions[$sort] ?? $sortOptions['new'];
 
 // WHERE句作成
 $conditions = [];
@@ -57,7 +66,7 @@ $sql = "
         category
     FROM items
     {$whereSql}
-    ORDER BY id DESC
+     ORDER BY {$orderBy}
     LIMIT {$perPage}
     OFFSET {$offset}
 ";
@@ -130,7 +139,11 @@ function buildQuery(array $overrides = []): string
             <?php endforeach; ?>
 
         </select>
-
+          <select name="sort">
+                <option value="new" <?= $sort === 'new' ? 'selected' : '' ?>>新着順</option>
+                <option value="price_asc" <?= $sort === 'price_asc' ? 'selected' : '' ?>>価格が安い順</option>
+                <option value="price_desc" <?= $sort === 'price_desc' ? 'selected' : '' ?>>価格が高い順</option>
+            </select>   
         <button type="submit">検索</button>
 
     </form>
